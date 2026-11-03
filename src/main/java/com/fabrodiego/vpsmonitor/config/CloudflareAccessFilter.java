@@ -60,13 +60,13 @@ public class CloudflareAccessFilter extends OncePerRequestFilter {
         throws ServletException, IOException {
         String token = request.getHeader(HEADER);
         if (token == null || token.isBlank()) {
-            response.sendError(HttpStatus.FORBIDDEN.value(), "Acesso so pelo Cloudflare Access");
+            response.sendError(HttpStatus.FORBIDDEN.value(), "Acesso só pelo Cloudflare Access");
             return;
         }
         try {
             decoder.decode(token);
         } catch (JwtException e) {
-            response.sendError(HttpStatus.FORBIDDEN.value(), "Token do Cloudflare Access invalido");
+            response.sendError(HttpStatus.FORBIDDEN.value(), "Token do Cloudflare Access inválido");
             return;
         }
         chain.doFilter(request, response);

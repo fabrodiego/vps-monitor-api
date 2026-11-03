@@ -24,7 +24,7 @@ public class AuthService {
 
     static final int MAX_FAILURES = 5;
     static final Duration LOCK_TIME = Duration.ofMinutes(15);
-    private static final String INVALID = "Usuario, senha ou codigo invalidos";
+    private static final String INVALID = "Usuário, senha ou código inválidos";
 
     private final AppProperties.Admin admin;
     private final PasswordEncoder passwordEncoder;
@@ -51,7 +51,7 @@ public class AuthService {
     public synchronized TokenResponse login(LoginRequest req) {
         Instant now = clock.instant();
         if (now.isBefore(lockedUntil)) {
-            throw new LockedException("Muitas tentativas. Tente de novo depois de " + lockedUntil);
+            throw new LockedException("Muitas tentativas erradas. Tente de novo em alguns minutos.");
         }
         // a senha e conferida sempre (mesmo com usuario errado) para nao vazar pelo tempo de resposta
         boolean passwordOk = passwordEncoder.matches(req.password(), admin.passwordHash());

@@ -31,16 +31,16 @@ public record HostGroup(AppKind kind, String name, String detail, String command
         String last = path.substring(path.lastIndexOf('/') + 1);
         if (last.endsWith(".service")) {
             String unit = last.substring(0, last.length() - ".service".length());
-            return new HostGroup(AppKind.SERVICO, unit, "servico " + last, command);
+            return new HostGroup(AppKind.SERVICO, unit, "serviço " + last, command);
         }
         Matcher session = SESSION.matcher(path);
         if (session.find()) {
             return new HostGroup(AppKind.SEM_NOME, command,
-                "sessao " + session.group(2) + " do usuario uid " + session.group(1), command);
+                "sessão " + session.group(2) + " do usuário uid " + session.group(1), command);
         }
         Matcher userManager = USER_MANAGER.matcher(path);
         if (userManager.find()) {
-            return new HostGroup(AppKind.SISTEMA, "systemd do usuario " + userManager.group(1), path, command);
+            return new HostGroup(AppKind.SISTEMA, "systemd do usuário " + userManager.group(1), path, command);
         }
         if (last.equals("init.scope")) {
             return new HostGroup(AppKind.SISTEMA, "systemd", "init.scope", command);

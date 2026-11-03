@@ -26,7 +26,7 @@ public class ApiExceptionHandler {
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     ProblemDetail typeMismatch(MethodArgumentTypeMismatchException ex) {
-        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Parametro invalido: " + ex.getName());
+        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Parâmetro inválido: " + ex.getName());
     }
 
     @ExceptionHandler(BadCredentialsException.class)
@@ -41,6 +41,6 @@ public class ApiExceptionHandler {
 
     @ExceptionHandler(PrometheusException.class)
     ProblemDetail prometheus(PrometheusException ex) {
-        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_GATEWAY, "Prometheus indisponivel: " + ex.getMessage());
+        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_GATEWAY, "Prometheus indisponível: " + ex.getMessage());
     }
 }

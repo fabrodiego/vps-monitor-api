@@ -28,14 +28,14 @@ class HostGroupTest {
         HostGroup g = HostGroup.parse("[/../../../../user.slice/user-1000.slice/session-927.scope]|java");
         assertEquals(AppKind.SEM_NOME, g.kind());
         assertEquals("java", g.name());
-        assertEquals("sessao 927 do usuario uid 1000", g.detail());
+        assertEquals("sessão 927 do usuário uid 1000", g.detail());
     }
 
     @Test
     void systemdDoUsuarioESistema() {
         HostGroup g = HostGroup.parse("[/../../../../user.slice/user-1002.slice/user@1002.service/init.scope]|systemd");
         assertEquals(AppKind.SISTEMA, g.kind());
-        assertEquals("systemd do usuario 1002", g.name());
+        assertEquals("systemd do usuário 1002", g.name());
         assertEquals(AppKind.SISTEMA, HostGroup.parse("[/../../../../init.scope]|systemd").kind());
     }
 

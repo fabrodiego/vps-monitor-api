@@ -22,7 +22,7 @@ public enum SeriesMetric {
         "GPU", "max(node_hwmon_temp_celsius * on(chip) group_left node_hwmon_chip_names{chip_name=\"amdgpu\"})")),
     NET("bytes_per_sec", ordered(
         "Entrada", "sum(rate(node_network_receive_bytes_total{" + Queries.NET_DEVICES + "}[$w]))",
-        "Saida", "sum(rate(node_network_transmit_bytes_total{" + Queries.NET_DEVICES + "}[$w]))"));
+        "Saída", "sum(rate(node_network_transmit_bytes_total{" + Queries.NET_DEVICES + "}[$w]))"));
 
     private final String unit;
     private final Map<String, String> lines;
