@@ -2,6 +2,8 @@ package com.fabrodiego.vpsmonitor.config;
 
 import java.io.IOException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
@@ -30,6 +32,7 @@ import jakarta.servlet.http.HttpServletResponse;
 public class CloudflareAccessFilter extends OncePerRequestFilter {
 
     static final String HEADER = "Cf-Access-Jwt-Assertion";
+    private static final Logger log = LoggerFactory.getLogger(CloudflareAccessFilter.class);
 
     private final JwtDecoder decoder;
 
@@ -60,12 +63,15 @@ public class CloudflareAccessFilter extends OncePerRequestFilter {
         throws ServletException, IOException {
         String token = request.getHeader(HEADER);
         if (token == null || token.isBlank()) {
+            log.warn("Recusado sem header do Access: {} {}", request.getMethod(), request.getRequestURI());
             response.sendError(HttpStatus.FORBIDDEN.value(), "Acesso só pelo Cloudflare Access");
             return;
         }
         try {
             decoder.decode(token);
         } catch (JwtException e) {
+            // so o motivo, nunca o token
+            log.warn("Token do Access recusado em {}: {}", request.getRequestURI(), e.getMessage());
             response.sendError(HttpStatus.FORBIDDEN.value(), "Token do Cloudflare Access inválido");
             return;
         }
