@@ -46,6 +46,7 @@ Todos em `/api/**` exigem `Authorization: Bearer <token>`, exceto o login.
 |---|---|
 | `POST /api/auth/login` | `{username, password, code}` → token |
 | `GET /api/auth/me` | Usuário logado |
+| `GET /api/access/voltar` | Redireciona para o site (usado para o Cloudflare Access emitir o cookie do domínio da API) |
 | `GET /api/monitor/overview` | CPU, RAM, swap, disco, GPU, rede, temperaturas, contadores |
 | `GET /api/monitor/series/{metric}?range=` | Série no tempo. `metric`: `cpu`, `ram`, `disk`, `gpu`, `temp`, `net`. `range`: `1h`, `6h`, `24h`, `7d` |
 | `GET /api/monitor/apps` | Consumo por app: namespaces do k8s, serviços systemd e processos sem dono (marcados com aviso) |

@@ -39,7 +39,7 @@ public class SecurityConfig {
             .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .requestMatchers("/api/auth/login").permitAll()
+                .requestMatchers("/api/auth/login", "/api/access/voltar").permitAll()
                 .requestMatchers("/error").permitAll()
                 .requestMatchers("/actuator/health/**").permitAll()
                 .anyRequest().authenticated())
