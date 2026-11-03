@@ -1,0 +1,37 @@
+spring:
+  application:
+    name: vps-monitor-api
+  threads:
+    virtual:
+      enabled: true
+
+server:
+  port: 8080
+  forward-headers-strategy: framework
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+app:
+  jwt:
+    secret: ${JWT_SECRET}
+    ttl: ${JWT_TTL:PT8H}
+    issuer: vps-monitor-api
+  cors:
+    origins: ${CORS_ORIGINS:https://vps.fabrodiego.com}
+  admin:
+    username: ${ADMIN_USER}
+    password-hash: ${ADMIN_PASSWORD_HASH}
+    totp-secret: ${ADMIN_TOTP_SECRET}
+  prometheus:
+    url: ${PROMETHEUS_URL:http://localhost:9090}
+  access:
+    team-domain: ${CF_ACCESS_TEAM_DOMAIN:}
+    audience: ${CF_ACCESS_AUD:}
