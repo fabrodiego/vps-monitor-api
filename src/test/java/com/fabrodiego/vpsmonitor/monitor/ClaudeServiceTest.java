@@ -40,7 +40,7 @@ class ClaudeServiceTest {
             "sub", List.of(s(30, "session_id", "a")),
             "memTotal", List.of(s(1000)));
 
-        ClaudeResponse r = ClaudeService.build(k -> data.getOrDefault(k, List.of()));
+        ClaudeResponse r = ClaudeService.build(k -> data.getOrDefault(k, List.of()), 200_000);
 
         assertTrue(r.exporterUp());
         assertTrue(r.remoteControlUp());
@@ -59,18 +59,46 @@ class ClaudeServiceTest {
         assertEquals(200_000, a.contextLimit());
         assertEquals(0.25, a.contextUsage());
         assertEquals(100, a.tokens().total());
+        assertEquals(10, a.tokens().fresh());
         assertEquals(30, a.subagentTokens());
     }
 
     @Test
     void semExportadorDevolveVazioEFora() {
-        ClaudeResponse r = ClaudeService.build(k -> List.of());
+        ClaudeResponse r = ClaudeService.build(k -> List.of(), 200_000);
         assertFalse(r.exporterUp());
         assertFalse(r.remoteControlUp());
         assertEquals(0, r.sessionsOpen());
         assertNull(r.memoryHostShare());
         assertTrue(r.sessions().isEmpty());
         assertEquals(0, r.tokens24h().total());
+    }
+
+    @Test
+    void contextoAcimaDoPadraoUsaJanelaGrande() {
+        Map<String, List<Sample>> data = Map.of(
+            "info", List.of(s(1, "session_id", "a", "model", "modelo-1")),
+            "ctx", List.of(s(213_000, "session_id", "a")));
+        ClaudeSession a = ClaudeService.build(k -> data.getOrDefault(k, List.of()), 200_000).sessions().get(0);
+        assertEquals(1_000_000, a.contextLimit());
+        assertEquals(0.213, a.contextUsage(), 1e-9);
+    }
+
+    @Test
+    void padraoConfiguravelValeParaContextoDentroDele() {
+        Map<String, List<Sample>> data = Map.of(
+            "info", List.of(s(1, "session_id", "a", "model", "modelo-1")),
+            "ctx", List.of(s(213_000, "session_id", "a")));
+        ClaudeSession a = ClaudeService.build(k -> data.getOrDefault(k, List.of()), 300_000).sessions().get(0);
+        assertEquals(300_000, a.contextLimit());
+    }
+
+    @Test
+    void tokensNovosVaoNoJson() throws Exception {
+        ClaudeDtos.Tokens t = ClaudeDtos.Tokens.of(1, 2, 3, 4);
+        assertEquals(7, t.fresh());
+        String json = new tools.jackson.databind.json.JsonMapper().writeValueAsString(t);
+        assertTrue(json.contains("\"fresh\":7.0"), json);
     }
 
     @Test

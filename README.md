@@ -25,6 +25,7 @@ API do **VPS Monitor**, um painel pessoal para acompanhar um servidor: CPU, RAM,
 | `CORS_ORIGINS` | Origens permitidas, separadas por vírgula |
 | `CF_ACCESS_TEAM_DOMAIN` | Nome da equipe no Cloudflare Zero Trust (`<nome>.cloudflareaccess.com`). Vazio desliga a checagem |
 | `CF_ACCESS_AUD` | Tag AUD da aplicação no Cloudflare Access |
+| `CLAUDE_CONTEXT_WINDOW` | Janela de contexto padrão das sessões do Claude Code, em tokens (padrão `200000`). Modelos `[1m]` ou sessões acima dela usam 1.000.000 |
 
 Gerar as credenciais:
 ```bash
@@ -54,7 +55,7 @@ Todos em `/api/**` exigem `Authorization: Bearer <token>`, exceto o login.
 | `GET /api/monitor/sites` | Sites testados (blackbox): no ar, status HTTP, tempo, validade do certificado, disponibilidade 24h |
 | `GET /api/monitor/database` | PostgreSQL: no ar, conexões, tamanho por banco |
 | `GET /api/monitor/alerts` | Alertas ativos do Prometheus |
-| `GET /api/monitor/claude` | Sessões do Claude Code no host: nome, status, RAM/CPU, contexto e tokens (métricas `claude_*`) |
+| `GET /api/monitor/claude` | Sessões do Claude Code no host: nome, status, RAM/CPU, contexto (limite via `CLAUDE_CONTEXT_WINDOW`) e tokens novos/total (métricas `claude_*`) |
 | `GET /actuator/health` | Health check |
 
 ## Métricas esperadas no Prometheus
