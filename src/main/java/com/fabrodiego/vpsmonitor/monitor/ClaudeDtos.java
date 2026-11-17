@@ -28,12 +28,12 @@ public final class ClaudeDtos {
     }
 
     /** cacheRead = contexto reaproveitado (barato); cacheWrite = contexto novo gravado no cache. */
-    public record Tokens(double input, double output, double cacheRead, double cacheWrite) {
+    public record Tokens(double input, double output, double cacheRead, double cacheWrite, double total) {
 
-        public double total() {
-            return input + output + cacheRead + cacheWrite;
+        static Tokens of(double input, double output, double cacheRead, double cacheWrite) {
+            return new Tokens(input, output, cacheRead, cacheWrite, input + output + cacheRead + cacheWrite);
         }
 
-        static final Tokens ZERO = new Tokens(0, 0, 0, 0);
+        static final Tokens ZERO = of(0, 0, 0, 0);
     }
 }

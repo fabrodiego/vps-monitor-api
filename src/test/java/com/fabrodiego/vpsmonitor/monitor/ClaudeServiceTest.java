@@ -72,4 +72,10 @@ class ClaudeServiceTest {
         assertTrue(r.sessions().isEmpty());
         assertEquals(0, r.tokens24h().total());
     }
+
+    @Test
+    void totalDeTokensVaiNoJson() throws Exception {
+        String json = new tools.jackson.databind.json.JsonMapper().writeValueAsString(ClaudeDtos.Tokens.of(1, 2, 3, 4));
+        assertTrue(json.contains("\"total\":10.0"), json);
+    }
 }

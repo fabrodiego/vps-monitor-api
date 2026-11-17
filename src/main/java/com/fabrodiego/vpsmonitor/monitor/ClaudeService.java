@@ -107,7 +107,7 @@ public class ClaudeService {
         if (byType == null) {
             return Tokens.ZERO;
         }
-        return new Tokens(byType.getOrDefault("input", 0.0), byType.getOrDefault("output", 0.0),
+        return Tokens.of(byType.getOrDefault("input", 0.0), byType.getOrDefault("output", 0.0),
             byType.getOrDefault("cache_read", 0.0), byType.getOrDefault("cache_write", 0.0));
     }
 
