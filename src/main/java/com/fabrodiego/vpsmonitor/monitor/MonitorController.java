@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fabrodiego.vpsmonitor.monitor.ClaudeDtos.ClaudeResponse;
 import com.fabrodiego.vpsmonitor.monitor.MonitorDtos.Alert;
 import com.fabrodiego.vpsmonitor.monitor.MonitorDtos.AppsResponse;
 import com.fabrodiego.vpsmonitor.monitor.MonitorDtos.DatabaseResponse;
@@ -26,9 +27,11 @@ import com.fabrodiego.vpsmonitor.monitor.MonitorDtos.Site;
 public class MonitorController {
 
     private final MonitorService service;
+    private final ClaudeService claude;
 
-    public MonitorController(MonitorService service) {
+    public MonitorController(MonitorService service, ClaudeService claude) {
         this.service = service;
+        this.claude = claude;
     }
 
     @GetMapping("/overview")
@@ -66,6 +69,12 @@ public class MonitorController {
     @GetMapping("/alerts")
     public List<Alert> alerts() {
         return service.alerts();
+    }
+
+    /** Sessoes do Claude Code no host: nome, consumo, contexto e tokens. */
+    @GetMapping("/claude")
+    public ClaudeResponse claude() {
+        return claude.claude();
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
