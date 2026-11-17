@@ -41,7 +41,8 @@ class AuthServiceTest {
             new AppProperties.Cors(List.of()),
             new AppProperties.Admin("diego", encoder.encode("senha-forte"), SECRET),
             new AppProperties.Prometheus("http://localhost"),
-            new AppProperties.Access("", ""));
+            new AppProperties.Access("", ""),
+            new AppProperties.Claude(200_000));
         TokenService tokens = new TokenService(
             new NimbusJwtEncoder(new ImmutableSecret<>(new SecretKeySpec(key, "HmacSHA256"))), props, clock);
         auth = new AuthService(props, encoder, tokens, clock);

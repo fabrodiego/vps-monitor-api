@@ -35,3 +35,5 @@ app:
   access:
     team-domain: ${CF_ACCESS_TEAM_DOMAIN:}
     audience: ${CF_ACCESS_AUD:}
+  claude:
+    context-window: ${CLAUDE_CONTEXT_WINDOW:200000}

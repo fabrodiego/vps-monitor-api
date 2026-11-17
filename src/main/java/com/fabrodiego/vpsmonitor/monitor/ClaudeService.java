@@ -10,6 +10,7 @@ import java.util.function.Function;
 
 import org.springframework.stereotype.Service;
 
+import com.fabrodiego.vpsmonitor.config.AppProperties;
 import com.fabrodiego.vpsmonitor.monitor.ClaudeDtos.ClaudeResponse;
 import com.fabrodiego.vpsmonitor.monitor.ClaudeDtos.ClaudeSession;
 import com.fabrodiego.vpsmonitor.monitor.ClaudeDtos.Tokens;
@@ -21,8 +22,7 @@ import com.fabrodiego.vpsmonitor.prom.PrometheusClient;
 @Service
 public class ClaudeService {
 
-    /** Janela de contexto padrao; modelos com "[1m]" no nome usam 1M. Estimativa para a barra de uso. */
-    static final int DEFAULT_CONTEXT_WINDOW = 200_000;
+    /** Janela grande: modelos com "[1m]" no nome, ou sessoes que ja passaram do padrao configurado. */
     static final int LARGE_CONTEXT_WINDOW = 1_000_000;
 
     static final Map<String, String> QUERIES = new LinkedHashMap<>();
@@ -39,24 +39,26 @@ public class ClaudeService {
         QUERIES.put("ctx", "claude_session_context_tokens");
         QUERIES.put("turns", "claude_session_turns_total");
         QUERIES.put("tok", "sum by (session_id, type) (claude_session_tokens_total)");
-        QUERIES.put("sub", "sum by (session_id) (claude_session_tokens_total{origem=\"subagentes\"})");
+        QUERIES.put("sub", "sum by (session_id) (claude_session_tokens_total{origem=\"subagentes\",type!=\"cache_read\"})");
         QUERIES.put("tok24h", "sum by (type) (increase(claude_session_tokens_total[24h]))");
         QUERIES.put("memTotal", Queries.MEM_TOTAL);
     }
 
     private final PrometheusClient prom;
+    private final int defaultContextWindow;
 
-    public ClaudeService(PrometheusClient prom) {
+    public ClaudeService(PrometheusClient prom, AppProperties props) {
         this.prom = prom;
+        this.defaultContextWindow = props.claude().contextWindow();
     }
 
     public ClaudeResponse claude() {
         BatchQuery r = BatchQuery.run(prom, QUERIES);
-        return build(r::samples);
+        return build(r::samples, defaultContextWindow);
     }
 
     /** Monta a resposta a partir das series (separado para testar sem Prometheus). */
-    static ClaudeResponse build(Function<String, List<Sample>> samples) {
+    static ClaudeResponse build(Function<String, List<Sample>> samples, int defaultContextWindow) {
         Map<String, Double> mem = bySession(samples.apply("mem"));
         Map<String, Double> cpu = bySession(samples.apply("cpu"));
         Map<String, Double> procs = bySession(samples.apply("procs"));
@@ -74,7 +76,7 @@ public class ClaudeService {
             String id = s.label("session_id");
             String model = s.label("model");
             Integer context = toInt(ctx.get(id));
-            int limit = contextWindow(model);
+            int limit = contextWindow(model, context, defaultContextWindow);
             sessions.add(new ClaudeSession(id, s.label("name"), s.label("status"), s.label("origem"), model,
                 mem.get(id), cpu.get(id), toInt(procs.get(id)),
                 started.containsKey(id) ? Math.round(started.get(id)) : null,
@@ -99,8 +101,10 @@ public class ClaudeService {
             tokens(t24), sessions);
     }
 
-    static int contextWindow(String model) {
-        return model != null && model.toLowerCase().contains("[1m]") ? LARGE_CONTEXT_WINDOW : DEFAULT_CONTEXT_WINDOW;
+    static int contextWindow(String model, Integer context, int defaultWindow) {
+        boolean large = model != null && model.toLowerCase().contains("[1m]");
+        boolean overDefault = context != null && context > defaultWindow;
+        return large || overDefault ? LARGE_CONTEXT_WINDOW : defaultWindow;
     }
 
     private static Tokens tokens(Map<String, Double> byType) {

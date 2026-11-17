@@ -6,7 +6,8 @@ import java.util.List;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "app")
-public record AppProperties(Jwt jwt, Cors cors, Admin admin, Prometheus prometheus, Access access) {
+public record AppProperties(Jwt jwt, Cors cors, Admin admin, Prometheus prometheus, Access access,
+                            Claude claude) {
 
     /** secret: base64, minimo 32 bytes (HS256). */
     public record Jwt(String secret, Duration ttl, String issuer) {
@@ -20,6 +21,10 @@ public record AppProperties(Jwt jwt, Cors cors, Admin admin, Prometheus promethe
     }
 
     public record Prometheus(String url) {
+    }
+
+    /** contextWindow: janela de contexto padrao (tokens) usada na barra de uso das sessoes. */
+    public record Claude(int contextWindow) {
     }
 
     /**
